@@ -1,0 +1,12 @@
+
+from database import Base, engine
+from models import TaskModel
+
+
+def create_tables():
+    Base.metadata.create_all(bind=engine)
+    print("TaskFlow database tables created successfully!")
+
+
+if __name__ == "__main__":
+    create_tables()

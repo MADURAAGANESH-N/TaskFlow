@@ -1,23 +1,28 @@
 
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException, status
-from pydantic import BaseModel, Field, field_validator
+from fastapi import Depends, FastAPI, HTTPException, status
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+from sqlalchemy.orm import Session
+
+from database import get_db
+from models import TaskModel
+
 
 app = FastAPI(
     title="TaskFlow API",
-    description="A task management API built with Python",
-    version="1.0.0",
+    description="A task management API using FastAPI and MySQL",
+    version="2.0.0",
 )
 
 
-# The data required when creating a task
+# Request model for creating a task
 class TaskCreate(BaseModel):
     title: str = Field(min_length=1, max_length=120)
 
     @field_validator("title")
     @classmethod
-    def title_must_not_be_blank(cls, value: str) -> str:
+    def validate_title(cls, value: str) -> str:
         value = value.strip()
 
         if not value:
@@ -26,24 +31,23 @@ class TaskCreate(BaseModel):
         return value
 
 
-# Fields that can be updated
+# Request model for updating a task
 class TaskUpdate(BaseModel):
     title: str | None = Field(
-        default=None, min_length=1, max_length=120
+        default=None,
+        min_length=1,
+        max_length=120,
     )
     status: Literal["pending", "completed"] | None = None
 
 
-# The task returned by the API
-class Task(BaseModel):
+# Response model: converts SQLAlchemy objects to API responses
+class TaskResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     title: str
-    status: Literal["pending", "completed"] = "pending"
-
-
-# Temporary in-memory storage
-tasks: dict[int, Task] = {}
-next_task_id = 1
+    status: Literal["pending", "completed"]
 
 
 @app.get("/")
@@ -56,16 +60,16 @@ def health_check():
     return {"status": "healthy"}
 
 
-# Read all tasks
-@app.get("/tasks", response_model=list[Task])
-def get_tasks():
-    return list(tasks.values())
+# Get all tasks from MySQL
+@app.get("/tasks", response_model=list[TaskResponse])
+def get_tasks(db: Session = Depends(get_db)):
+    return db.query(TaskModel).order_by(TaskModel.id).all()
 
 
-# Read one task
-@app.get("/tasks/{task_id}", response_model=Task)
-def get_task(task_id: int):
-    task = tasks.get(task_id)
+# Get one task from MySQL
+@app.get("/tasks/{task_id}", response_model=TaskResponse)
+def get_task(task_id: int, db: Session = Depends(get_db)):
+    task = db.get(TaskModel, task_id)
 
     if task is None:
         raise HTTPException(
@@ -76,31 +80,33 @@ def get_task(task_id: int):
     return task
 
 
-# Create a task
+# Create and save a task in MySQL
 @app.post(
     "/tasks",
-    response_model=Task,
+    response_model=TaskResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def create_task(data: TaskCreate):
-    global next_task_id
-
-    task = Task(
-        id=next_task_id,
+def create_task(data: TaskCreate, db: Session = Depends(get_db)):
+    task = TaskModel(
         title=data.title,
         status="pending",
     )
 
-    tasks[next_task_id] = task
-    next_task_id += 1
+    db.add(task)
+    db.commit()
+    db.refresh(task)
 
     return task
 
 
-# Update a task
-@app.patch("/tasks/{task_id}", response_model=Task)
-def update_task(task_id: int, data: TaskUpdate):
-    task = tasks.get(task_id)
+# Update a task in MySQL
+@app.patch("/tasks/{task_id}", response_model=TaskResponse)
+def update_task(
+    task_id: int,
+    data: TaskUpdate,
+    db: Session = Depends(get_db),
+):
+    task = db.get(TaskModel, task_id)
 
     if task is None:
         raise HTTPException(
@@ -133,26 +139,30 @@ def update_task(task_id: int, data: TaskUpdate):
             detail="Status cannot be null",
         )
 
-    updated_data = task.model_dump()
-    updated_data.update(changes)
+    for field, value in changes.items():
+        setattr(task, field, value)
 
-    updated_task = Task(**updated_data)
-    tasks[task_id] = updated_task
+    db.commit()
+    db.refresh(task)
 
-    return updated_task
+    return task
 
 
-# Delete a task
+# Delete a task from MySQL
 @app.delete(
     "/tasks/{task_id}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
-def delete_task(task_id: int):
-    if task_id not in tasks:
+def delete_task(task_id: int, db: Session = Depends(get_db)):
+    task = db.get(TaskModel, task_id)
+
+    if task is None:
         raise HTTPException(
             status_code=404,
             detail="Task not found",
         )
 
-    del tasks[task_id]
+    db.delete(task)
+    db.commit()
+
     return None
