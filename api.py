@@ -1,7 +1,7 @@
 
 from typing import Literal
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, Query, status
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy.orm import Session
 
@@ -60,33 +60,33 @@ def health_check():
     return {"status": "healthy"}
 
 
-# Get all tasks from MySQL
 
+# Get all tasks with filtering, sorting, and pagination
 @app.get("/tasks", response_model=list[TaskResponse])
 def get_tasks(
     status: Literal["pending", "completed"] | None = None,
     sort: Literal["asc", "desc"] = "asc",
+    limit: int = Query(default=10, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
     db: Session = Depends(get_db),
 ):
-    # Start a query for all tasks in MySQL
     query = db.query(TaskModel)
 
-    # Filter by status when the client supplies it
+    # Filter by status when supplied
     if status is not None:
         query = query.filter(TaskModel.status == status)
 
-    # Sort tasks by their ID
+    # Sort task IDs
     if sort == "desc":
         query = query.order_by(TaskModel.id.desc())
     else:
         query = query.order_by(TaskModel.id.asc())
 
-    # Execute the query and return the results
-    return query.all()
+    # Apply pagination
+    return query.offset(offset).limit(limit).all()
 
 
-
-# Get one task from MySQL
+# Get one task by ID
 @app.get("/tasks/{task_id}", response_model=TaskResponse)
 def get_task(task_id: int, db: Session = Depends(get_db)):
     task = db.get(TaskModel, task_id)
@@ -98,6 +98,7 @@ def get_task(task_id: int, db: Session = Depends(get_db)):
         )
 
     return task
+
 
 
 # Create and save a task in MySQL
