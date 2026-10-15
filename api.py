@@ -61,9 +61,29 @@ def health_check():
 
 
 # Get all tasks from MySQL
+
 @app.get("/tasks", response_model=list[TaskResponse])
-def get_tasks(db: Session = Depends(get_db)):
-    return db.query(TaskModel).order_by(TaskModel.id).all()
+def get_tasks(
+    status: Literal["pending", "completed"] | None = None,
+    sort: Literal["asc", "desc"] = "asc",
+    db: Session = Depends(get_db),
+):
+    # Start a query for all tasks in MySQL
+    query = db.query(TaskModel)
+
+    # Filter by status when the client supplies it
+    if status is not None:
+        query = query.filter(TaskModel.status == status)
+
+    # Sort tasks by their ID
+    if sort == "desc":
+        query = query.order_by(TaskModel.id.desc())
+    else:
+        query = query.order_by(TaskModel.id.asc())
+
+    # Execute the query and return the results
+    return query.all()
+
 
 
 # Get one task from MySQL
