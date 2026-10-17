@@ -286,3 +286,49 @@ def test_users_cannot_access_each_others_tasks():
     )
     assert response.status_code == 200
     assert response.json()["status"] == "pending"
+
+
+def test_invalid_token_is_rejected():
+    response = client.get(
+        "/tasks",
+        headers={"Authorization": "Bearer invalid.token.value"},
+    )
+
+    assert response.status_code == 401
+
+
+def test_invalid_status_filter_is_rejected(auth_headers):
+    response = client.get(
+        "/tasks",
+        params={"status": "cancelled"},
+        headers=auth_headers,
+    )
+
+    assert response.status_code == 422
+
+
+def test_invalid_pagination_is_rejected(auth_headers):
+    response = client.get(
+        "/tasks",
+        params={"limit": 0},
+        headers=auth_headers,
+    )
+
+    assert response.status_code == 422
+
+
+def test_empty_update_is_rejected(auth_headers):
+    created = client.post(
+        "/tasks",
+        json={"title": "Test empty update"},
+        headers=auth_headers,
+    )
+    task_id = created.json()["id"]
+
+    response = client.patch(
+        f"/tasks/{task_id}",
+        json={},
+        headers=auth_headers,
+    )
+
+    assert response.status_code == 400
