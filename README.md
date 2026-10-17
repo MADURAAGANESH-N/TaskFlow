@@ -71,11 +71,9 @@ Some practice files may vary depending on your current local project. The main A
 If you have already created a GitHub repository, clone it using the repository URL shown on that repository's GitHub page:
 
 ```powershell
-git clone <YOUR_TASKFLOW_REPOSITORY_URL>
+git clone https://github.com/MADURAAGANESH-N/TaskFlow.git
 cd TaskFlow
 ```
-
-Replace `<YOUR_TASKFLOW_REPOSITORY_URL>` with the actual clone URL. Your GitHub profile is [MADURAAGANESH-N](https://github.com/MADURAAGANESH-N).
 
 If the project is already on your computer, open the existing `TaskFlow` folder instead.
 
