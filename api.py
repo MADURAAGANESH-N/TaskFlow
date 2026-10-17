@@ -1,22 +1,29 @@
-
+from contextlib import asynccontextmanager
 from typing import Literal
 
 from fastapi import Depends, FastAPI, HTTPException, Query, status
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy.orm import Session
-from auth import get_current_user, router as auth_router
 
-from database import get_db
+from auth import get_current_user, router as auth_router
+from database import Base, engine, get_db
 from models import TaskModel, UserModel
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    Base.metadata.create_all(bind=engine)
+    yield
 
 
 app = FastAPI(
     title="TaskFlow API",
     description="A task management API using FastAPI and MySQL",
     version="2.0.0",
+    lifespan=lifespan,
 )
 
 app.include_router(auth_router)
+
 
 # Request model for creating a task
 class TaskCreate(BaseModel):
