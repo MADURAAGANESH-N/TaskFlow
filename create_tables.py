@@ -1,6 +1,5 @@
-
 from database import Base, engine
-from models import TaskModel
+from models import TaskModel, UserModel
 
 
 def create_tables():

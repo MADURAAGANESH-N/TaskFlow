@@ -4,9 +4,10 @@ from typing import Literal
 from fastapi import Depends, FastAPI, HTTPException, Query, status
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy.orm import Session
+from auth import get_current_user, router as auth_router
 
 from database import get_db
-from models import TaskModel
+from models import TaskModel, UserModel
 
 
 app = FastAPI(
@@ -15,6 +16,7 @@ app = FastAPI(
     version="2.0.0",
 )
 
+app.include_router(auth_router)
 
 # Request model for creating a task
 class TaskCreate(BaseModel):
@@ -62,6 +64,7 @@ def health_check():
 
 
 # Get all tasks with filtering, sorting, and pagination
+
 @app.get("/tasks", response_model=list[TaskResponse])
 def get_tasks(
     status: Literal["pending", "completed"] | None = None,
@@ -69,27 +72,41 @@ def get_tasks(
     limit: int = Query(default=10, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
     db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_user),
 ):
-    query = db.query(TaskModel)
+    # Retrieve only this user's tasks
+    query = db.query(TaskModel).filter(
+        TaskModel.user_id == current_user.id
+    )
 
-    # Filter by status when supplied
     if status is not None:
         query = query.filter(TaskModel.status == status)
 
-    # Sort task IDs
     if sort == "desc":
         query = query.order_by(TaskModel.id.desc())
     else:
         query = query.order_by(TaskModel.id.asc())
 
-    # Apply pagination
     return query.offset(offset).limit(limit).all()
 
 
+
 # Get one task by ID
+
 @app.get("/tasks/{task_id}", response_model=TaskResponse)
-def get_task(task_id: int, db: Session = Depends(get_db)):
-    task = db.get(TaskModel, task_id)
+def get_task(
+    task_id: int,
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_user),
+):
+    task = (
+        db.query(TaskModel)
+        .filter(
+            TaskModel.id == task_id,
+            TaskModel.user_id == current_user.id,
+        )
+        .first()
+    )
 
     if task is None:
         raise HTTPException(
@@ -101,16 +118,23 @@ def get_task(task_id: int, db: Session = Depends(get_db)):
 
 
 
+
 # Create and save a task in MySQL
+
 @app.post(
     "/tasks",
     response_model=TaskResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def create_task(data: TaskCreate, db: Session = Depends(get_db)):
+def create_task(
+    data: TaskCreate,
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_user),
+):
     task = TaskModel(
         title=data.title,
         status="pending",
+        user_id=current_user.id,
     )
 
     db.add(task)
@@ -120,14 +144,24 @@ def create_task(data: TaskCreate, db: Session = Depends(get_db)):
     return task
 
 
+
 # Update a task in MySQL
+
 @app.patch("/tasks/{task_id}", response_model=TaskResponse)
 def update_task(
     task_id: int,
     data: TaskUpdate,
     db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_user),
 ):
-    task = db.get(TaskModel, task_id)
+    task = (
+        db.query(TaskModel)
+        .filter(
+            TaskModel.id == task_id,
+            TaskModel.user_id == current_user.id,
+        )
+        .first()
+    )
 
     if task is None:
         raise HTTPException(
@@ -170,12 +204,24 @@ def update_task(
 
 
 # Delete a task from MySQL
+
 @app.delete(
     "/tasks/{task_id}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
-def delete_task(task_id: int, db: Session = Depends(get_db)):
-    task = db.get(TaskModel, task_id)
+def delete_task(
+    task_id: int,
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_user),
+):
+    task = (
+        db.query(TaskModel)
+        .filter(
+            TaskModel.id == task_id,
+            TaskModel.user_id == current_user.id,
+        )
+        .first()
+    )
 
     if task is None:
         raise HTTPException(
