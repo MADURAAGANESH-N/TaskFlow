@@ -2,14 +2,14 @@
 
 TaskFlow is a Python backend project for managing tasks through a REST API. Built with **FastAPI, MySQL, and SQLAlchemy**, it supports user registration and login, JWT-based authentication, user-specific task ownership, task CRUD operations, status filtering, sorting, pagination, and automated testing.
 
-**Project status:** Deployed on Railway, with core API operations and user-ownership protection tested in the production environment.
+**Project status:** Deployed on Railway. Core API operations and user-ownership protection have been tested in the production environment.
 
 ## 🚀 Live Demo
 
 - **Live API:** https://taskflow-production-75ba.up.railway.app/
 - **Interactive API Documentation (Swagger UI):** https://taskflow-production-75ba.up.railway.app/docs
 
-Explore the API endpoints using Swagger UI to test task management and authentication features.
+Use Swagger UI to explore the available endpoints and test task management and authentication features.
 
 ## ✨ Features
 
@@ -17,13 +17,13 @@ Explore the API endpoints using Swagger UI to test task management and authentic
 - **JWT authentication** for protected API requests.
 - **User-specific task ownership:** users can access and manage only their own tasks.
 - **Task CRUD operations:** create, retrieve, update, and delete tasks.
-- **MySQL persistence** using SQLAlchemy ORM.
+- **MySQL persistence** using the SQLAlchemy ORM.
 - **Status filtering:** retrieve pending or completed tasks.
 - **Sorting:** sort tasks by ID in ascending or descending order.
 - **Pagination:** retrieve a limited number of tasks using `limit` and `offset`.
 - **Input validation** for task titles, status values, and pagination parameters.
 - **Interactive API documentation** through Swagger UI and ReDoc.
-- **Automated testing** using pytest, FastAPI TestClient, and an isolated in-memory SQLite test database.
+- **Automated tests** using pytest, FastAPI TestClient, and an isolated in-memory SQLite test database.
 
 ## 🛠️ Technology Stack
 
@@ -43,40 +43,40 @@ Explore the API endpoints using Swagger UI to test task management and authentic
 | Git and GitHub | Version control and source-code hosting |
 | Railway | Application deployment |
 
-## Project Structure
+## 📁 Project Structure
 
 ```text
 TaskFlow/
-├── api.py             # FastAPI app and task endpoints
-├── auth.py            # Registration, login, JWT token utilities
-├── database.py        # SQLAlchemy engine, sessions, DB dependency
-├── models.py          # SQLAlchemy UserModel and TaskModel
-├── create_tables.py   # Create missing database tables
-├── check_db.py        # Check the MySQL connection
-├── test_api.py        # Automated API tests
-├── taskflow_cli.py    # Earlier command-line task manager
-├── day3_oop.py        # OOP practice file
-├── main.py            # Earlier API practice file, if retained
-├── requirements.txt   # Python dependencies
-├── .env               # Local secrets/configuration; never commit
-├── .gitignore         # Files excluded from Git
-└── README.md          # Project documentation
+├── api.py              # FastAPI application and task endpoints
+├── auth.py             # Registration, login, and JWT utilities
+├── database.py         # SQLAlchemy engine, sessions, and DB dependency
+├── models.py           # SQLAlchemy UserModel and TaskModel
+├── create_tables.py    # Create missing database tables
+├── check_db.py         # Check the MySQL connection
+├── test_api.py         # Automated API tests
+├── taskflow_cli.py     # Earlier command-line task manager
+├── day3_oop.py         # OOP practice file
+├── main.py             # Earlier API practice file, if retained
+├── requirements.txt    # Python dependencies
+├── .env.example        # Example environment configuration, if present
+├── .gitignore          # Files excluded from Git
+└── README.md           # Project documentation
 ```
 
-Some practice files may vary depending on your current local project. The main API entry point is `api.py`.
+Some practice files may vary depending on the current project folder. The main API entry point is `api.py`. Never commit the local `.env` file or real credentials.
 
-## Prerequisites
+## ✅ Prerequisites
 
 - Python 3.11 or a compatible Python version
 - MySQL Server
 - Git
-- PowerShell on Windows, or a compatible terminal
+- PowerShell on Windows or a compatible terminal
 
-## Installation and Setup
+## ⚙️ Installation and Setup
 
 ### 1. Get the source code
 
-If you have already created a GitHub repository, clone it using the repository URL shown on that repository's GitHub page:
+Clone the repository:
 
 ```powershell
 git clone https://github.com/MADURAAGANESH-N/TaskFlow.git
@@ -105,7 +105,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
 python -m pip install -r requirements.txt
 ```
 
-If you are setting up the project before `requirements.txt` is complete, the dependencies used by the application include:
+If `requirements.txt` is incomplete, the application dependencies include:
 
 ```powershell
 python -m pip install fastapi uvicorn sqlalchemy pymysql python-dotenv "pwdlib[argon2]" PyJWT python-multipart pytest httpx
@@ -134,7 +134,7 @@ DB_NAME=taskflow_db
 SECRET_KEY=YOUR_GENERATED_SECRET_KEY
 ```
 
-Replace the example values with your own local configuration. Generate a strong, unique secret key on your own computer. For example:
+Replace the example values with your own local configuration. Generate a strong, unique secret key on your computer. For example:
 
 ```powershell
 python -c "import secrets; print(secrets.token_urlsafe(32))"
@@ -169,7 +169,7 @@ DESCRIBE users;
 DESCRIBE tasks;
 ```
 
-If the `tasks.user_id` column is missing, and the `users` table already exists, apply the migration below once. Do not run it if the column or constraint already exists:
+If `tasks.user_id` is missing and the `users` table already exists, apply the migration below once. Do not run it if the column or constraint already exists:
 
 ```sql
 ALTER TABLE tasks
@@ -199,7 +199,7 @@ python -m uvicorn api:app --reload
 
 Uvicorn should report that the application is running at `http://127.0.0.1:8000`.
 
-## API Documentation
+## 📚 API Documentation
 
 With the server running, open:
 
@@ -210,7 +210,7 @@ With the server running, open:
 
 Register an account and log in before calling protected task endpoints. Swagger UI can be used to try the endpoints interactively.
 
-## API Endpoints
+## 🔌 API Endpoints
 
 ### Authentication
 
@@ -241,7 +241,7 @@ All task endpoints require a valid bearer access token.
 |---|---|---|---|
 | `status` | `pending`, `completed` | No filter | Return tasks with the selected status |
 | `sort` | `asc`, `desc` | `asc` | Sort by task ID |
-| `limit` | `1`–`100` | `10` | Maximum tasks to return |
+| `limit` | `1`–`100` | `10` | Maximum number of tasks to return |
 | `offset` | `0` or greater | `0` | Number of matching tasks to skip |
 
 Examples:
@@ -283,7 +283,7 @@ GET /tasks?status=pending&sort=asc&limit=5&offset=0
 
 Use your own credentials for testing; do not use example passwords for real accounts.
 
-## Authentication and Authorization
+## 🔐 Authentication and Authorization
 
 - Registration stores a password hash rather than the original password.
 - Login returns a signed JWT access token.
@@ -292,9 +292,9 @@ Use your own credentials for testing; do not use example passwords for real acco
 - A user attempting to retrieve, update, or delete another user's task should receive `404 Not Found`.
 - Requests without a valid token should receive `401 Unauthorized`.
 
-The access token lifetime is configured in `auth.py`. Keep the JWT signing secret private and use HTTPS and appropriate production configuration before deploying the API publicly.
+The access-token lifetime is configured in `auth.py`. Keep the JWT signing secret private, enforce HTTPS, and maintain appropriate production configuration, database permissions, backups, and monitoring.
 
-## Database Design
+## 🗄️ Database Design
 
 ### `users`
 
@@ -311,9 +311,9 @@ The access token lifetime is configured in `auth.py`. Keep the JWT signing secre
 - `status`: `pending` or `completed`, defaulting to `pending`
 - `created_at`: task creation timestamp
 
-MySQL stores the application data persistently. The automated tests use a separate in-memory SQLite database and override the normal database dependency so tests do not alter the development MySQL records.
+MySQL stores application data persistently. The automated tests use a separate in-memory SQLite database and override the normal database dependency so tests do not alter development MySQL records.
 
-## Running Automated Tests
+## 🧪 Running Automated Tests
 
 Run the test suite from the project root with the virtual environment activated:
 
@@ -321,9 +321,9 @@ Run the test suite from the project root with the virtual environment activated:
 python -m pytest -v
 ```
 
-The current test suite was run successfully with **16 tests passing**. Tests cover registration, invalid login credentials, authentication requirements, task CRUD operations, filtering, sorting, pagination, invalid input, and user ownership. Test results can change as code is updated; rerun the suite to confirm the current result.
+The test suite previously passed with **16 tests**. Tests cover registration, invalid login credentials, authentication requirements, task CRUD operations, filtering, sorting, pagination, invalid input, and user ownership. Results can change as code is updated; rerun the suite to confirm the current result.
 
-## Git Workflow
+## 🔄 Git Workflow
 
 Check working changes:
 
@@ -331,11 +331,11 @@ Check working changes:
 git status
 ```
 
-Stage specific changes and create a commit:
+Stage the README and create a commit:
 
 ```powershell
 git add README.md
-git commit -m "Add TaskFlow project documentation"
+git commit -m "Update TaskFlow project documentation"
 git log -1 --oneline
 ```
 
@@ -346,13 +346,13 @@ git status
 git check-ignore .env
 ```
 
-## Current Limitations
+## ⚠️ Current Limitations
 
 - Existing database tables require explicit migrations when the schema changes; SQLAlchemy `create_all()` does not modify existing columns.
 - Tasks created before user ownership was introduced may require deliberate data migration or assignment.
 - Additional production hardening, including database backups, rate limiting, monitoring, and robust secret management, remains an area for improvement.
 
-## Future Improvements
+## 🔮 Future Improvements
 
 - Add database migrations using Alembic.
 - Build a frontend for task management.
@@ -360,10 +360,9 @@ git check-ignore .env
 - Introduce due dates, priorities, search, and additional task-management features.
 - Improve production monitoring, database backups, and operational security.
 
-## Author
+## 👨‍💻 Author
 
 **Maduraaganesh N.**
 
-- GitHub: [MADURAAGANESH-N](https://github.com/MADURAAGANESH-N/TaskFlow)
-
-> **Repository URL:** Add your TaskFlow repository link here once the repository has been created or published.
+- GitHub Profile: https://github.com/MADURAAGANESH-N
+- Project Repository: https://github.com/MADURAAGANESH-N/TaskFlow
