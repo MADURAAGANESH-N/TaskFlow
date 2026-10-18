@@ -4,6 +4,12 @@ TaskFlow is a Python backend project for managing tasks through a REST API. It i
 
 > **Project status:** Developed and tested locally. Deployment to a production hosting platform is not included yet.
 
+## 🚀 Live Demo
+
+- **Live API:** https://taskflow-production-75ba.up.railway.app/
+- **Interactive API Documentation (Swagger UI):** https://taskflow-production-75ba.up.railway.app/docs
+
+Explore the API endpoints through Swagger UI to test task management and authentication features.
 ## Features
 
 - **User registration and login** with password hashing.
