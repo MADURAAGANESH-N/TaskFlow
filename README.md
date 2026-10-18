@@ -1,30 +1,31 @@
 # TaskFlow — Task Management REST API
 
-TaskFlow is a Python backend project for managing tasks through a REST API. It is built with **FastAPI**, **MySQL**, and **SQLAlchemy**. The application supports user registration and login, JWT-based authentication, user-specific task ownership, task CRUD operations, status filtering, sorting, pagination, and automated tests.
+TaskFlow is a Python backend project for managing tasks through a REST API. Built with **FastAPI, MySQL, and SQLAlchemy**, it supports user registration and login, JWT-based authentication, user-specific task ownership, task CRUD operations, status filtering, sorting, pagination, and automated testing.
 
-> **Project status:** Developed and tested locally. Deployment to a production hosting platform is not included yet.
+**Project status:** Deployed on Railway, with core API operations and user-ownership protection tested in the production environment.
 
 ## 🚀 Live Demo
 
 - **Live API:** https://taskflow-production-75ba.up.railway.app/
 - **Interactive API Documentation (Swagger UI):** https://taskflow-production-75ba.up.railway.app/docs
 
-Explore the API endpoints through Swagger UI to test task management and authentication features.
-## Features
+Explore the API endpoints using Swagger UI to test task management and authentication features.
+
+## ✨ Features
 
 - **User registration and login** with password hashing.
-- **JWT access tokens** for protected API requests.
+- **JWT authentication** for protected API requests.
 - **User-specific task ownership:** users can access and manage only their own tasks.
 - **Task CRUD operations:** create, retrieve, update, and delete tasks.
 - **MySQL persistence** using SQLAlchemy ORM.
 - **Status filtering:** retrieve pending or completed tasks.
 - **Sorting:** sort tasks by ID in ascending or descending order.
-- **Pagination:** request a limited number of tasks with `limit` and `offset`.
+- **Pagination:** retrieve a limited number of tasks using `limit` and `offset`.
 - **Input validation** for task titles, status values, and pagination parameters.
 - **Interactive API documentation** through Swagger UI and ReDoc.
-- **Automated tests** using pytest, FastAPI TestClient, and an isolated in-memory SQLite test database.
+- **Automated testing** using pytest, FastAPI TestClient, and an isolated in-memory SQLite test database.
 
-## Technology Stack
+## 🛠️ Technology Stack
 
 | Technology | Purpose |
 |---|---|
@@ -34,12 +35,13 @@ Explore the API endpoints through Swagger UI to test task management and authent
 | MySQL | Persistent relational database |
 | SQLAlchemy | ORM and database access |
 | PyMySQL | Python-to-MySQL driver |
-| python-dotenv | Load local configuration from `.env` |
+| python-dotenv | Local environment configuration |
 | pwdlib with Argon2 support | Password hashing |
-| PyJWT | Create and verify JWT access tokens |
+| PyJWT | JWT access-token creation and verification |
 | pytest | Automated testing |
 | HTTPX / FastAPI TestClient | API testing utilities |
-| Git | Version control |
+| Git and GitHub | Version control and source-code hosting |
+| Railway | Application deployment |
 
 ## Project Structure
 
