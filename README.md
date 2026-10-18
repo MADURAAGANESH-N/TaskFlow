@@ -348,23 +348,22 @@ git check-ignore .env
 
 ## Current Limitations
 
-- The project has been developed and tested locally; production deployment is not included yet.
-- Database schema changes to existing tables require an explicit migration; `create_all()` alone does not migrate existing columns.
-- Tasks created before user ownership was introduced may have no owner until deliberately migrated or assigned.
-- HTTPS setup, production secret management, database backups, rate limiting, and production monitoring need additional configuration before public deployment.
+- Existing database tables require explicit migrations when the schema changes; SQLAlchemy `create_all()` does not modify existing columns.
+- Tasks created before user ownership was introduced may require deliberate data migration or assignment.
+- Additional production hardening, including database backups, rate limiting, monitoring, and robust secret management, remains an area for improvement.
 
 ## Future Improvements
 
-- Add database migrations with Alembic.
+- Add database migrations using Alembic.
 - Build a frontend for task management.
-- Add continuous integration to run tests automatically.
-- Add deployment automation and production monitoring.
-- Add richer task capabilities, such as due dates, priorities, and search.
+- Strengthen CI/CD checks and deployment reliability.
+- Introduce due dates, priorities, search, and additional task-management features.
+- Improve production monitoring, database backups, and operational security.
 
 ## Author
 
 **Maduraaganesh N.**
 
-- GitHub: [MADURAAGANESH-N](https://github.com/MADURAAGANESH-N)
+- GitHub: [MADURAAGANESH-N](https://github.com/MADURAAGANESH-N/TaskFlow)
 
 > **Repository URL:** Add your TaskFlow repository link here once the repository has been created or published.
